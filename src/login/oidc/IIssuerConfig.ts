@@ -61,4 +61,7 @@ export default interface IIssuerConfig {
   requireRequestUriRegistration?: boolean;
   opPolicyUri?: URL;
   opTosUri?: URL;
+  // This parameter enables detecting when interacting with NSS, to adopt specific behaviours
+  // until some bugs are fixed.
+  issuerPoweredBy?: string;
 }

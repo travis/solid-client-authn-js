@@ -159,6 +159,7 @@ export default class IssuerConfigFetcher implements IIssuerConfigFetcher {
   async fetchConfig(issuer: URL): Promise<IIssuerConfig> {
     let issuerConfig: IIssuerConfig;
 
+    console.log("looking up the config");
     // Try to look up the config in the cache
     issuerConfig = (await this.storageUtility.safeGet(
       this.getLocalStorageKey(issuer),
@@ -174,10 +175,27 @@ export default class IssuerConfigFetcher implements IIssuerConfigFetcher {
 
     const wellKnownUrl = new URL(issuer.toString());
     wellKnownUrl.set("pathname", "/.well-known/openid-configuration");
-    const issuerConfigRequestBody = await this.fetcher.fetch(wellKnownUrl);
+    const issuerConfigResponse = await this.fetcher.fetch(wellKnownUrl);
     // Check the validity of the fetched config
     try {
-      issuerConfig = this.processConfig(await issuerConfigRequestBody.json());
+      console.log(
+        `fetching the config: ${JSON.stringify(issuerConfigResponse.headers)}`
+      );
+      issuerConfig = this.processConfig(await issuerConfigResponse.json());
+      // This adds custom information in the provider config, in particular
+      // the server that implements it. Until some bugs are resolved on NSS,
+      // that enables working around them
+
+      if (issuerConfigResponse.headers.has("X-Powered-By")) {
+        const poweredBy = issuerConfigResponse.headers.get(
+          "X-Powered-By"
+        ) as string;
+        console.log(`config powered by ${poweredBy}`);
+        // The cast to a string is safe since we checked for the presence of the key in the first place
+        issuerConfig.issuerPoweredBy = issuerConfigResponse.headers.get(
+          "X-Powered-By"
+        ) as string;
+      }
     } catch (err) {
       throw new ConfigurationError(
         `[${issuer.toString()}] has an invalid configuration: ${err.message}`

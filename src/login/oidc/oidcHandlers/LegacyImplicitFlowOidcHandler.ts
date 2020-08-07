@@ -47,6 +47,25 @@ export default class LegacyImplicitFlowOidcHandler implements IOidcHandler {
   ) {}
 
   async canHandle(oidcLoginOptions: IOidcOptions): Promise<boolean> {
+    const tmp = !!(
+      oidcLoginOptions.issuerConfiguration.grantTypesSupported &&
+      oidcLoginOptions.issuerConfiguration.grantTypesSupported.indexOf(
+        "implicit"
+      ) > -1 &&
+      // FIXME: Escape hatch to detect that we are talking to NSS and not the id broker.
+      // NSS should support auth code flow, and we should be able not
+      // to use the legacy flow at all. There is curretnly a bug in how we handle NSS's
+      // auth code flow though. Once fixed, the auth code flow can be made higher
+      // priority in the dependencies.ts file, and this bandaid can be removed.
+      oidcLoginOptions.issuerConfiguration.issuerPoweredBy?.includes(
+        "solid-server/"
+      )
+    );
+    console.log(
+      `Implicit handle ${tmp ? "can" : "cannot"} handle a request from ${
+        oidcLoginOptions.issuerConfiguration.issuerPoweredBy
+      }`
+    );
     return !!(
       oidcLoginOptions.issuerConfiguration.grantTypesSupported &&
       oidcLoginOptions.issuerConfiguration.grantTypesSupported.indexOf(
@@ -57,9 +76,9 @@ export default class LegacyImplicitFlowOidcHandler implements IOidcHandler {
       // to use the legacy flow at all. There is curretnly a bug in how we handle NSS's
       // auth code flow though. Once fixed, the auth code flow can be made higher
       // priority in the dependencies.ts file, and this bandaid can be removed.
-      oidcLoginOptions.issuerConfiguration.grantTypesSupported.indexOf(
-        "urn:ietf:params:oauth:grant-type:jwt-bearer"
-      ) === -1
+      oidcLoginOptions.issuerConfiguration.issuerPoweredBy?.includes(
+        "solid-server/"
+      )
     );
   }
 
