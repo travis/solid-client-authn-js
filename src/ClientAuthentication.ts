@@ -65,6 +65,10 @@ export default class ClientAuthentication {
       sessionId,
       oidcIssuer: this.urlOptionToUrl(options.oidcIssuer),
       redirectUrl: this.urlOptionToUrl(options.redirectUrl),
+      postLogoutRedirectUrl: options.postLogoutRedirectUrl
+        ?.map(this.urlOptionToUrl)
+        // Undefined values are filtered out, which justifies the type assertion
+        .filter(value => value !== undefined) as URL[],
       clientId: options.clientId,
       clientSecret: options.clientSecret,
       clientName: options.clientId,

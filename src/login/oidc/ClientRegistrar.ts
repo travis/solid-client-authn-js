@@ -32,6 +32,7 @@ export interface IRegistrarOptions {
   clientSecret?: string;
   clientName?: string;
   redirectUrl?: URL;
+  postLogoutRedirectUrl?: URL[];
 }
 
 export interface IClientRegistrar {
@@ -105,7 +106,10 @@ export default class ClientRegistrar implements IClientRegistrar {
         redirect_uris: [options.redirectUrl?.toString()],
         subject_type: "pairwise",
         token_endpoint_auth_method: "client_secret_basic",
-        code_challenge_method: "S256"
+        code_challenge_method: "S256",
+        post_logout_redirect_uris: options.postLogoutRedirectUrl
+          ? options.postLogoutRedirectUrl?.map(toString)
+          : []
         /* eslint-enable @typescript-eslint/camelcase */
       };
       if (!issuerConfig.registrationEndpoint) {

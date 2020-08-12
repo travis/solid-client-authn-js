@@ -28,6 +28,7 @@ export default interface ILoginOptions {
   sessionId: string;
   oidcIssuer?: URL;
   redirectUrl?: URL;
+  postLogoutRedirectUrl?: URL[];
   clientId?: string;
   clientSecret?: string;
   clientName?: string;

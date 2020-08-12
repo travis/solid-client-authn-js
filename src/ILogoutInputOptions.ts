@@ -21,13 +21,7 @@
 
 import URL from "url-parse";
 
-export default interface ILoginInputOptions {
-  oidcIssuer?: URL;
-  redirectUrl?: URL;
-  postLogoutRedirectUrl?: URL[];
-  clientId?: string;
-  clientSecret?: string;
-  clientName?: string;
-  popUp?: boolean;
+export default interface ILogoutInputOptions {
+  postLogoutRedirectUrl?: URL;
   handleRedirect?: (redirectUrl: string) => unknown;
 }

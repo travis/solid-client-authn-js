@@ -45,5 +45,6 @@ export interface ICoreOidcOptions {
 export interface IAccessTokenOidcOptions extends ICoreOidcOptions {
   dpop: boolean;
   redirectUrl: URL;
+  postLogoutRedirectUrl?: URL;
   handleRedirect?: (url: string) => unknown;
 }

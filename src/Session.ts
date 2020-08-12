@@ -26,6 +26,7 @@ import ISessionInfo from "./sessionInfo/ISessionInfo";
 import ClientAuthentication from "./ClientAuthentication";
 import { getClientAuthenticationWithDependencies } from "./dependencies";
 import { v4 } from "uuid";
+import ILogoutInputOptions from "./ILogoutInputOptions";
 
 export interface ISessionOptions {
   secureStorage: IStorage;
@@ -82,8 +83,12 @@ export class Session extends EventEmitter {
     return this.clientAuthentication.fetch(this.info.sessionId, url, init);
   };
 
-  logout = async (): Promise<void> => {
-    await this.clientAuthentication.logout(this.info.sessionId);
+  logout = async (options: ILogoutInputOptions): Promise<void> => {
+    await this.clientAuthentication.logout(
+      this.info.sessionId,
+      options.postLogoutRedirectUrl,
+      options.handleRedirect
+    );
     this.emit("logout");
   };
 

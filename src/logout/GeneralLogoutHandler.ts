@@ -25,6 +25,7 @@ import { IStorageUtility } from "../storage/StorageUtility";
 import { IIssuerConfigFetcher } from "../login/oidc/IssuerConfigFetcher";
 import URL from "url-parse";
 import { IRedirector } from "../login/oidc/Redirector";
+import formurlencoded from "form-urlencoded";
 
 @injectable()
 export default class LogoutHandler implements ILogoutHandler {
@@ -91,6 +92,17 @@ export default class LogoutHandler implements ILogoutHandler {
     // FIXME: according to https://openid.net/specs/openid-connect-rpinitiated-1_0.html#RPLogout,
     // id_token_hint should be sent as part of the logout request to the end_session_endpoint.
     // However, some OP seem not to support this option, which is disabled for the time being.
+    // Check the config for a post-logout redirection
+    if (logoutOptions.redirectUrl) {
+      logoutEndpoint.set("query", {
+        // Camel case is mandated by the OIDC spec
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        post_redirect_logout_uri: logoutOptions.redirectUrl,
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        // id_token_hint: idToken,
+        state: logoutOptions.sessionId
+      });
+    }
     this.redirector.redirect(logoutEndpoint.toString(), {
       handleRedirect: logoutOptions.handleRedirect
     });
